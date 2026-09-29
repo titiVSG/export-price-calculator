@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2563eb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Export Calculator">
+<title>Export Price Calculator</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--text:#172033;--muted:#667085;--blue:#2563eb;--blue2:#1d4ed8;--line:#e4e7ec;--soft:#eef2f7;--details:#f8fafc;--danger:#b42318;--dangerbg:#fef3f2}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}body{padding:max(18px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}.app{max-width:1180px;margin:auto}h1{margin:0;font-size:clamp(28px,4vw,38px);letter-spacing:-.03em}.sub{margin:6px 0 20px;color:var(--muted)}.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}.top{margin-bottom:16px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 28px rgba(15,23,42,.06);padding:20px}.result{background:var(--blue);color:#fff;border:0;display:flex;flex-direction:column;justify-content:center;min-height:130px}.kicker{font-size:12px;font-weight:800;letter-spacing:.08em;color:#dbeafe}.resultValue{font-size:clamp(30px,4vw,42px);font-weight:850;letter-spacing:-.035em;margin-top:5px}.resultDesc{color:#dbeafe;margin-top:7px}.title{font-size:18px;font-weight:800;margin:0 0 14px}.seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--soft);padding:4px;border-radius:13px}.seg button{border:0;background:transparent;border-radius:10px;min-height:44px;font-weight:800;color:var(--text)}.seg button.active{background:var(--blue);color:#fff}.row{display:grid;grid-template-columns:180px minmax(0,1fr) 82px;gap:12px;align-items:center;margin:11px 0}.row label,.tank>label{font-size:14px;font-weight:750}.unit{font-size:13px;color:var(--muted)}input{width:100%;min-width:0;height:44px;border:1px solid #d0d5dd;border-radius:11px;background:#fff;color:var(--text);padding:0 13px;font-size:16px;outline:none}input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.13)}.tank{display:grid;grid-template-columns:180px minmax(105px,1fr) auto minmax(80px,.65fr) auto minmax(120px,.9fr);gap:10px;align-items:center;margin:11px 0}.tankTotal{height:44px;border-radius:11px;background:var(--soft);display:flex;align-items:center;justify-content:center;font-weight:800;white-space:nowrap}.actions{display:grid;grid-template-columns:2fr 1fr;gap:10px;margin-top:20px}.btn{min-height:48px;border:0;border-radius:11px;font-weight:800;font-size:15px}.primary{background:var(--blue);color:#fff}.primary:active{background:var(--blue2)}.secondary{background:var(--soft);color:var(--text)}.error{display:none;margin-top:14px;padding:12px 14px;border-radius:11px;background:var(--dangerbg);color:var(--danger);font-size:14px}.error.show{display:block}.detailsCard{min-height:620px;display:flex;flex-direction:column}.details{flex:1;overflow:auto;background:var(--details);border-radius:12px;padding:18px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:13px;line-height:1.55;white-space:pre-wrap;-webkit-overflow-scrolling:touch}.foot{text-align:center;color:var(--muted);font-size:12px;margin-top:16px}
+@media(max-width:880px){.grid{grid-template-columns:1fr}.detailsCard{min-height:500px}}@media(max-width:620px){.card{padding:16px}.seg{grid-template-columns:1fr}.row{grid-template-columns:1fr 74px;gap:7px 10px}.row label{grid-column:1/-1}.tank{grid-template-columns:1fr 74px;gap:7px 10px}.tank>label,.tankTotal{grid-column:1/-1}.actions{grid-template-columns:1fr}.detailsCard{min-height:440px}.details{max-height:62vh}}
+</style>
+</head>
+<body>
+<main class="app">
+<h1>Export Price Calculator</h1><p class="sub">Customer price ↔ Factory price</p>
+<section class="grid top">
+<div class="card"><h2 class="title">Calculation mode</h2><div class="seg"><button id="m1" class="active">Customer → Factory</button><button id="m2">Factory → Customer</button></div></div>
+<div class="card result" aria-live="polite"><div class="kicker">RESULT</div><div id="result" class="resultValue">-- RMB/kg</div><div id="resultDesc" class="resultDesc">Enter the values below and click Calculate.</div></div>
+</section>
+<section class="grid">
+<div class="card"><h2 class="title">Parameters</h2>
+<div class="row"><label for="qty">Quantity</label><input id="qty" value="20000" inputmode="decimal"><span class="unit">kg</span></div>
+<div class="row"><label for="ocean">Ocean fees</label><input id="ocean" value="900" inputmode="decimal"><span class="unit">USD</span></div>
+<div class="row"><label for="local">Local fees</label><input id="local" value="10000" inputmode="decimal"><span class="unit">RMB</span></div>
+<div class="row"><label for="fx">USD / CNY</label><input id="fx" value="6.75" inputmode="decimal"><span class="unit">rate</span></div>
+<div class="row"><label for="factor">Export factor</label><input id="factor" value="1.13" inputmode="decimal"><span class="unit">factor</span></div>
+<div class="tank"><label>Tank rent</label><input id="tankDay" value="0" inputmode="decimal" aria-label="Tank rent price per day"><span class="unit">USD/day</span><input id="tankDays" value="0" inputmode="decimal" aria-label="Tank rent days"><span class="unit">days</span><div id="tankTotal" class="tankTotal">0.00 USD</div></div>
+<div class="row"><label id="priceLabel" for="price">Customer price</label><input id="price" value="6.780" inputmode="decimal"><span id="priceUnit" class="unit">USD/kg</span></div>
+<div class="actions"><button id="calc" class="btn primary">Calculate</button><button id="reset" class="btn secondary">Reset</button></div><div id="error" class="error" role="alert"></div>
+</div>
+<div class="card detailsCard"><h2 class="title">Calculation details</h2><div id="details" class="details">Ready.\n\nEnter the parameters on the left, then click Calculate.\n\nThe complete calculation will appear here, step by step.</div></div>
+</section>
+<div class="foot">All calculations are performed locally on this device.</div>
+</main>
+<script>
+(()=>{const $=id=>document.getElementById(id);const e={m1:$('m1'),m2:$('m2'),qty:$('qty'),ocean:$('ocean'),local:$('local'),fx:$('fx'),factor:$('factor'),tankDay:$('tankDay'),tankDays:$('tankDays'),tankTotal:$('tankTotal'),price:$('price'),priceLabel:$('priceLabel'),priceUnit:$('priceUnit'),calc:$('calc'),reset:$('reset'),result:$('result'),resultDesc:$('resultDesc'),details:$('details'),error:$('error')};let mode='c2f';
+const clean=v=>String(v??'').trim().replace(/[\s\u00a0]/g,'').replace(',','.');
+function num(v,name,opt={}){const x=Number(clean(v));if(!clean(v)||!Number.isFinite(x))throw Error(`${name} is not a valid number.`);if(opt.pos&&x<=0)throw Error(`${name} must be greater than zero.`);if(opt.nonneg&&x<0)throw Error(`${name} cannot be negative.`);return x}
+const fmt=(x,d=2)=>Number(x).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});const rf=x=>String(Number(x.toPrecision(12)));
+function tank(){const a=Number(clean(e.tankDay.value)||0),b=Number(clean(e.tankDays.value)||0);e.tankTotal.textContent=Number.isFinite(a)&&Number.isFinite(b)&&a>=0&&b>=0?`${fmt(a*b,2)} USD`:'-- USD'}
+function ready(){e.details.textContent='Ready.\n\nEnter the parameters on the left, then click Calculate.\n\nThe complete calculation will appear here, step by step.'}
+function setMode(m){mode=m;const c=m==='c2f';e.m1.classList.toggle('active',c);e.m2.classList.toggle('active',!c);e.priceLabel.textContent=c?'Customer price':'Factory price';e.priceUnit.textContent=c?'USD/kg':'RMB/kg';e.price.value=c?'6.780':'50.806';e.result.textContent=c?'-- RMB/kg':'-- USD/kg';e.resultDesc.textContent='Enter the values below and click Calculate.';e.error.classList.remove('show');ready()}
+function values(){const v={qty:num(e.qty.value,'Quantity',{pos:true}),ocean:num(e.ocean.value,'Ocean fees',{nonneg:true}),local:num(e.local.value,'Local fees',{nonneg:true}),fx:num(e.fx.value,'USD/CNY',{pos:true}),factor:num(e.factor.value,'Export factor',{pos:true}),tankDay:num(e.tankDay.value,'Tank rent daily price',{nonneg:true}),tankDays:num(e.tankDays.value,'Tank rent days',{nonneg:true}),price:num(e.price.value,'Price',{pos:true})};v.tank=v.tankDay*v.tankDays;return v}
+function c2f(v){const customer=v.price*v.qty,afterOcean=customer-v.ocean,localUsd=v.local/v.fx,afterLocal=afterOcean-localUsd,avail=afterLocal-v.tank;if(avail<=0)throw Error('The total fees are greater than the available customer value.');const afterFactor=avail*v.factor,totalRmb=afterFactor*v.fx,price=totalRmb/v.qty;e.result.textContent=`${fmt(price,3)} RMB/kg`;e.resultDesc.textContent='Maximum calculated factory price';e.details.textContent=`CUSTOMER PRICE → FACTORY PRICE
+==================================================
+
+INPUT DATA
+--------------------------------------------------
+Customer price  : ${fmt(v.price,3)} USD/kg
+Quantity        : ${fmt(v.qty,2)} kg
+Ocean fees      : ${fmt(v.ocean,2)} USD
+Local fees      : ${fmt(v.local,2)} RMB
+Tank rent/day   : ${fmt(v.tankDay,2)} USD/day
+Tank rent days  : ${fmt(v.tankDays,2)} days
+Tank rent total : ${fmt(v.tank,2)} USD
+USD/CNY         : ${rf(v.fx)}
+Export factor   : ${rf(v.factor)}
+
+GENERAL FORMULA
+--------------------------------------------------
+Factory price RMB/kg =
+((Customer price × Quantity - Ocean fees - Local fees / USD-CNY - Tank rent) × Export factor × USD-CNY) / Quantity
+
+Tank rent = Price/day × Number of days
+
+STEP-BY-STEP CALCULATION
+==================================================
+
+STEP 1 — TOTAL CUSTOMER VALUE
+${fmt(v.price,3)} USD/kg × ${fmt(v.qty,2)} kg = ${fmt(customer,2)} USD
+
+STEP 2 — REMOVE OCEAN FREIGHT
+${fmt(customer,2)} - ${fmt(v.ocean,2)} = ${fmt(afterOcean,2)} USD
+
+STEP 3 — CONVERT LOCAL FEES TO USD
+${fmt(v.local,2)} RMB / ${rf(v.fx)} = ${fmt(localUsd,4)} USD
+
+STEP 4 — REMOVE LOCAL FEES
+${fmt(afterOcean,2)} - ${fmt(localUsd,4)} = ${fmt(afterLocal,4)} USD
+
+STEP 5 — CALCULATE AND REMOVE TANK RENT
+${fmt(v.tankDay,2)} USD/day × ${fmt(v.tankDays,2)} days = ${fmt(v.tank,2)} USD
+${fmt(afterLocal,4)} - ${fmt(v.tank,2)} = ${fmt(avail,4)} USD
+
+STEP 6 — APPLY EXPORT FACTOR
+${fmt(avail,4)} × ${rf(v.factor)} = ${fmt(afterFactor,4)}
+
+STEP 7 — CONVERT TO RMB
+${fmt(afterFactor,4)} × ${rf(v.fx)} = ${fmt(totalRmb,2)} RMB
+
+STEP 8 — FACTORY PRICE PER KG
+${fmt(totalRmb,2)} / ${fmt(v.qty,2)} = ${fmt(price,6)} RMB/kg
+
+FINAL RESULT
+==================================================
+Exact calculated value: ${fmt(price,6)} RMB/kg
+Commercial result: ${fmt(price,3)} RMB/kg`}
+function f2c(v){const totalRmb=v.price*v.qty,before=totalRmb/v.factor,avail=before/v.fx,localUsd=v.local/v.fx,afterLocal=avail+localUsd,afterTank=afterLocal+v.tank,customer=afterTank+v.ocean,price=customer/v.qty;e.result.textContent=`${fmt(price,3)} USD/kg`;e.resultDesc.textContent='Calculated customer selling price';e.details.textContent=`FACTORY PRICE → CUSTOMER PRICE
+==================================================
+
+INPUT DATA
+--------------------------------------------------
+Factory price   : ${fmt(v.price,3)} RMB/kg
+Quantity        : ${fmt(v.qty,2)} kg
+Ocean fees      : ${fmt(v.ocean,2)} USD
+Local fees      : ${fmt(v.local,2)} RMB
+Tank rent/day   : ${fmt(v.tankDay,2)} USD/day
+Tank rent days  : ${fmt(v.tankDays,2)} days
+Tank rent total : ${fmt(v.tank,2)} USD
+USD/CNY         : ${rf(v.fx)}
+Export factor   : ${rf(v.factor)}
+
+GENERAL FORMULA
+--------------------------------------------------
+Customer price USD/kg = ((Factory price × Quantity) / Export factor / USD-CNY + Local fees / USD-CNY + Tank rent + Ocean fees) / Quantity
+
+Tank rent = Price/day × Number of days
+
+STEP-BY-STEP CALCULATION
+==================================================
+
+STEP 1 — TOTAL FACTORY VALUE
+${fmt(v.price,3)} RMB/kg × ${fmt(v.qty,2)} kg = ${fmt(totalRmb,2)} RMB
+
+STEP 2 — REVERSE EXPORT FACTOR
+${fmt(totalRmb,2)} / ${rf(v.factor)} = ${fmt(before,4)} RMB
+
+STEP 3 — CONVERT FACTORY VALUE TO USD
+${fmt(before,4)} / ${rf(v.fx)} = ${fmt(avail,4)} USD
+
+STEP 4 — CONVERT LOCAL FEES TO USD
+${fmt(v.local,2)} / ${rf(v.fx)} = ${fmt(localUsd,4)} USD
+
+STEP 5 — ADD LOCAL FEES
+${fmt(avail,4)} + ${fmt(localUsd,4)} = ${fmt(afterLocal,4)} USD
+
+STEP 6 — CALCULATE AND ADD TANK RENT
+${fmt(v.tankDay,2)} USD/day × ${fmt(v.tankDays,2)} days = ${fmt(v.tank,2)} USD
+${fmt(afterLocal,4)} + ${fmt(v.tank,2)} = ${fmt(afterTank,4)} USD
+
+STEP 7 — ADD OCEAN FREIGHT
+${fmt(afterTank,4)} + ${fmt(v.ocean,2)} = ${fmt(customer,4)} USD
+
+STEP 8 — CUSTOMER PRICE PER KG
+${fmt(customer,4)} / ${fmt(v.qty,2)} = ${fmt(price,6)} USD/kg
+
+FINAL RESULT
+==================================================
+Exact calculated value: ${fmt(price,6)} USD/kg
+Commercial result: ${fmt(price,3)} USD/kg`}
+function calc(){try{e.error.classList.remove('show');const v=values();mode==='c2f'?c2f(v):f2c(v);e.details.scrollTop=0}catch(err){e.error.textContent=err.message||'Invalid input.';e.error.classList.add('show')}}
+function reset(){e.qty.value='20000';e.ocean.value='900';e.local.value='10000';e.fx.value='6.75';e.factor.value='1.13';e.tankDay.value='0';e.tankDays.value='0';tank();setMode(mode)}
+e.m1.onclick=()=>setMode('c2f');e.m2.onclick=()=>setMode('f2c');e.calc.onclick=calc;e.reset.onclick=reset;e.tankDay.oninput=tank;e.tankDays.oninput=tank;[e.qty,e.ocean,e.local,e.fx,e.factor,e.tankDay,e.tankDays,e.price].forEach(i=>i.addEventListener('keydown',x=>{if(x.key==='Enter'){x.preventDefault();calc()}}));tank();ready();if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));})();
+</script>
+</body>
+</html>
